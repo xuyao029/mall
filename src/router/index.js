@@ -14,7 +14,6 @@ Router.prototype.replace = function replace(location) {
     return originalReplace.call(this, location).catch(err => err);
 };
 
-
 const routes =[
   {
     path: '/',
