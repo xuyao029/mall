@@ -13,9 +13,9 @@
       <recommend-view :recommends="recommends"/>
       <feature-view></feature-view>
       <tab-control :titles="titles" @tabClick="tabClick" ref="tabControl2"></tab-control>
-      <good-list :goods="showGoods"></good-list>
+      <goods-list :goods="showGoods"></goods-list>
     </Scroll>
-    <back-top @click.native="backClick" v-show="isShowBackTop"/>
+    <back-top @click.native="backTop" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -26,12 +26,11 @@ import FeatureView from './childComos/FeatureView'
 
 import NavBar from 'components/common/navbar/NavBar'
 import TabControl from 'components/content/tabControl/TabControl'
-import GoodList from 'components/content/goods/GoodList'
+import GoodsList from 'components/content/goods/GoodsList'
 import Scroll from 'components/common/scroll/Scroll'
-import BackTop from 'components/content/backtop/BackTop'
 
 import {getHomeMultidata,getHomeGoods} from 'network/home'
-import {debounce} from '@/common/utils'
+import { backTopMixin,itemImgListenerMixin } from "@/common/mixin";
 
 export default {
   name: "Home",
@@ -41,9 +40,8 @@ export default {
     RecommendView,
     FeatureView,
     TabControl,
-    GoodList,
+    GoodsList,
     Scroll,
-    BackTop
   },
   data(){
     return {
@@ -58,13 +56,26 @@ export default {
       currentType:'pop',
       isShowBackTop:false,
       taboffsetTop: 0,
-      isTabFixed:false
+      isTabFixed:false,
+      saveY:0,
     }
   },
+    // vue重复代码的混入
+  mixins: [ itemImgListenerMixin, backTopMixin],
   computed: {
     showGoods(){
       return this.goods[this.currentType].list
     }
+  },
+  activated() {
+    this.$refs.scroll.refresh()
+  },
+  deactivated() {
+    //保存y值
+    this.saveY= this.$refs.scroll.getScrollY()
+
+    //2.取消全局事件的监听
+    this.$bus.$off("imgLoad", this.itemImgListener)
   },
   created(){
     //1.请求多个数据
@@ -73,13 +84,6 @@ export default {
     this.getHomeGoods('pop')
     this.getHomeGoods('new')
     this.getHomeGoods('sell')
-  },
-   mounted() {
-     //1.图片加载完成的事件监听
-    const refresh = debounce(this.$refs.scroll.refresh)
-    this.$bus.$on('itemImagesLoad',()=>{
-      refresh()
-    })
   },
   methods: {
     /**事件监听相关的方法**/
@@ -97,9 +101,6 @@ export default {
       }
       this.$refs.tabControl1.currentIndex = index;
       this.$refs.tabControl2.currentIndex = index;
-    },
-    backClick(){
-      this.$refs.scroll.scrollTo(0,0,500)
     },
     contentScroll(position){
       //1.判断BackTop是否显示
@@ -130,7 +131,8 @@ export default {
         this.goods[type].page += 1
         //完成上拉加载更多
         this.$refs.scroll.finishPullUp()
-      }).catch((e) => {})
+        this.$refs.scroll.refresh()
+      })
     }
   }
 }
@@ -156,5 +158,19 @@ export default {
   position: relative;
   z-index: 9;
 }
+/* vue的淡入淡出动画 */
+.scroll-enter-active,
+.scroll-leave-active {
+  transition: all 0.3s;
+}
 
+.scroll-enter,
+.scroll-leave-to {
+  opacity: 0;
+}
+
+.scroll-enter-to,
+.scroll-leave {
+  opacity: 1;
+}
 </style>

@@ -5,7 +5,8 @@ import VueRouter from 'vue-router'
 const Home =() => import('../views/home/home')
 const Cart =() => import('../views/cart/cart')
 const Category =() => import('../views/category/category')
-const Profile =() => import('../views/profile/profile')
+const Profile =() => import('../views/profile/Profile')
+const Detail =() => import('../views/detail/Detail')
 
 Vue.use(Router)
 // 【添加代码】解决vue-router在3.0版本以上重复点路由报错
@@ -34,6 +35,10 @@ const routes =[
   {
     path: '/me',
     component:Profile
+  },
+  {
+    path: '/detail',
+    component:Detail
   }
 ]
 

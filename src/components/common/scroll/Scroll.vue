@@ -56,8 +56,15 @@ export default {
        this.scroll&&this.scroll.finishPullUp()
     },
     refresh(){
-      this.scroll&&this.scroll.refresh();
+    this.scroll&&this.scroll.refresh();
 
+    },
+    getScrollY(){
+      return this.scroll ? this.scroll.y : 0
+    },
+    // 滚动到指定元素
+    scrollToElement(el, time) {
+      this.scroll.scrollToElement(el, time);
     }
   }
   }
