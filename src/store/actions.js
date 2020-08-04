@@ -5,7 +5,8 @@ export default {
     if (list) {
       state.cartList = list;
       // find返回的是item
-      let result = state.cartList.find(item => {
+
+      let result = list.find(item => {
         return item.id === data.id;
       });
 

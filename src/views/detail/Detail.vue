@@ -151,13 +151,14 @@ export default {
     },
     // 添加购物车
     addToCart() {
+
       // 1.获取需要展示到购物车的商品信息
       const obj = {
         image: this.topImages[0],
         title: this.goods.title,
         desc: this.goods.desc,
-        price: this.goods.lowNowPrice,
-        id: this.detailId
+        price: this.goods.realPrice,
+        id: this.iid
       };
 
       // 2.将商品数据传到购物车页面
